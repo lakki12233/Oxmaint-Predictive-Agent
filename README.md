@@ -160,7 +160,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 The CLIP model files are **not included** in the repository due to size (335 MB). If you want to experiment with CLIP:
 
-1. **Download the CLIP model files** from [Google Drive](https://drive.google.com/drive/folders/YOUR_FOLDER_ID) or train your own using the notebook in `Rust_Detection_Notebook/`
+1. **Download the CLIP model files** from [Google Drive](https://drive.google.com/file/d/1F_SfsV89RgQvpJyD_w_Bd-_dJs-uuwuE/view?usp=sharing) or train your own using the notebook in `Rust_Detection_Notebook/`
 
 2. **Place the files in the artifacts folder:**
    ```
