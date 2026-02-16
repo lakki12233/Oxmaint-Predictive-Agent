@@ -150,7 +150,51 @@ Measured at 10/50/200 request levels with concurrency=10.
 
 ---
 
-## 5. Recommendations
+## 5. Automated Test Suite
+
+The system includes 22 automated pytest tests organized into 5 categories:
+
+| Test Class | Tests | Coverage |
+|------------|-------|----------|
+| `TestHealthEndpoint` | 3 | Health check, model version, status validation |
+| `TestPredictEndpoint` | 8 | Single predictions, all modality combinations |
+| `TestInputValidation` | 5 | Schema validation, error handling, edge cases |
+| `TestBatchEndpoint` | 4 | Batch predictions, mixed inputs, empty batches |
+| `TestFeatureExtraction` | 2 | Sensor feature handling, missing values |
+
+**Run tests:**
+```powershell
+pytest tests/api/test_api.py -v
+```
+
+---
+
+## 6. Fault Type Detection
+
+| Fault Type | Detection Trigger | Source Modality |
+|------------|-------------------|-----------------|
+| `bearing_failure` | High vibration + high std deviation (p≥0.7, std>50) | Sensor |
+| `seal_leak` | Moderate failure + short TTB (p≥0.5, TTB≤72h) | Sensor |
+| `corrosion_rust` | Rust detected with >85% confidence | Image |
+| `environmental_stress` | Environmental risk multiplier ≥1.5 | Environmental |
+| `null` | No fault conditions met | - |
+
+---
+
+## 7. Datasets
+
+| Dataset | Source | Size | License |
+|---------|--------|------|---------|
+| Sensor Data | [Kaggle Pump Sensor Data](https://www.kaggle.com/datasets/nphantawee/pump-sensor-data) | ~220k samples | CC0 Public Domain |
+| Image Training | [Roboflow Rust Detection](https://universe.roboflow.com/test-stage/rust-detection-t8vza/dataset/8) | ~2k images | CC BY 4.0 |
+| Image Testing | Manual photos | 10 images | Internal |
+| Environmental | Synthetic | 3 scenarios | N/A |
+
+See [data/DATASET_MANIFEST.md](data/DATASET_MANIFEST.md) for full data quality documentation.
+
+---
+
+## 8. Recommendations
 
 | Priority | Recommendation |
 |----------|----------------|

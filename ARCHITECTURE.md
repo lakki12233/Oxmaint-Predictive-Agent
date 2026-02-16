@@ -86,12 +86,97 @@ Combines all modality outputs:
 | File | Purpose |
 |------|---------|
 | `app/main.py` | API endpoints + fusion logic |
+| `app/schemas.py` | Pydantic request/response schemas |
 | `app/modalities/sensor.py` | Sensor inference |
 | `app/modalities/image.py` | ONNX rust detection (model switching logic) |
 | `app/modalities/environmental.py` | Risk scoring |
 | `artifacts/*.joblib` | LightGBM models |
 | `artifacts/rust_model.onnx` | MobileNetV3 image model (default, 6 MB) |
 | `artifacts/rust_clip.onnx` | CLIP image model (experimental, 335 MB) |
+
+---
+
+## Project Structure
+
+```
+oxmaint-predictive-agent/
+├── app/                          # Core application
+│   ├── main.py                   # FastAPI + fusion logic
+│   ├── schemas.py                # Pydantic schemas
+│   └── modalities/               # Modality processors
+│       ├── sensor.py             # LightGBM inference
+│       ├── image.py              # ONNX rust detection
+│       └── environmental.py      # Rule-based scoring
+├── artifacts/                    # Model files
+├── tests/                        # Test suite (22 tests)
+│   ├── api/test_api.py           # Pytest tests
+│   ├── images/                   # Test images
+│   └── scripts/                  # Test utilities
+├── train/                        # Training scripts
+├── Rust_Detection_Notebook/      # Colab notebooks
+├── ui/                           # Web testing UI
+├── docker/Dockerfile             # Container config
+├── docs/                         # Documentation
+├── data/                         # Dataset + manifest
+└── samples/                      # Example payloads
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Service status, model versions |
+| `POST` | `/predict` | Single asset prediction |
+| `POST` | `/predict/batch` | Batch predictions (array of requests) |
+
+### Request Schema
+
+```json
+{
+  "asset_id": "pump_001",
+  "timestamp": "2026-02-14T14:30:00Z",
+  "sensor_window": [
+    {"ts": "...", "sensor_00": 0.1, "sensor_01": 0.2, ...}
+  ],
+  "image_base64": "iVBORw0KGgo...",  // Optional
+  "environmental": {                  // Optional
+    "operating_hours": 2500,
+    "days_since_last_maintenance": 90,
+    "ambient_temperature_c": 48,
+    "ambient_humidity_percent": 88,
+    "load_factor": 0.98,
+    "maintenance_overdue": true
+  }
+}
+```
+
+### Response Schema
+
+```json
+{
+  "asset_id": "pump_001",
+  "failure_probability": 0.497,
+  "estimated_time_to_breakdown_hours": 448.79,
+  "predicted_fault_type": "corrosion_rust",
+  "fault_confidence": 0.995,
+  "top_signals": ["img:rust(p=0.995)", "stable_vibration", ...],
+  "inference_ms": 46,
+  "model_version": "sensor_lgbm_v2_multimodal",
+  "explanation": "CAUTION: Moderate failure risk (49.7%)..."
+}
+```
+
+### Fault Types
+
+| Fault Type | Detection Source | Trigger Condition |
+|------------|------------------|-------------------|
+| `bearing_failure` | Sensor | High p_fail (≥0.7) + high std deviation (>50) |
+| `seal_leak` | Sensor | Moderate p_fail (≥0.5) + short TTB (≤72h) |
+| `corrosion_rust` | Image | Rust detected with confidence ≥85% |
+| `environmental_stress` | Environmental | Risk multiplier ≥1.5 |
+| `null` | - | No fault conditions met |
 
 ---
 

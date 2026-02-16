@@ -236,6 +236,7 @@ Write-Host "Result: $($result.top_signals[1])"
 
 ## References
 
-- CLIP Training Notebook: `llm_rust_detection_training.ipynb`
+- CLIP Training Notebook: `Rust_Detection_Notebook/VLM_rust_detection_training.ipynb`
+- MobileNetV3 Training Notebook: `Rust_Detection_Notebook/rust_detection_model_training.ipynb`
 - Quick Start Guide: [QUICK_START.md](../QUICK_START.md)
 - Test Images: `tests/images/rust/`, `tests/images/no_rust/`

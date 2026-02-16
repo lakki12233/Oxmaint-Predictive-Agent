@@ -89,7 +89,7 @@ If environmental conditions are critical (multiplier ≥ 1.5) and no other fault
 Test environmental modality:
 ```powershell
 # Test all scenarios
-.\tools\test_environmental.ps1
+.\tests\scripts\test_environmental.ps1
 
 # Or test individual files
 $body = Get-Content .\samples\env_critical.json -Raw

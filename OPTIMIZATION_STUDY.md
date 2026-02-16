@@ -1,4 +1,4 @@
-# Optimization Study (Task 8)
+# Optimization Study 
 
 Answers to the five key questions about model optimization and deployment.
 
@@ -97,7 +97,19 @@ FastAPI → Message Queue → Logging Service → TimescaleDB
 | Slow pandas rolling stats | Replaced with NumPy direct computation | 4-5x faster |
 | Single worker bottleneck | Multi-worker uvicorn (4 workers) | 3-4x more throughput |
 
-**After Optimization**: 88ms per request, 100 requests/second
+### Optimization Journey
+
+| Stage | Throughput | P50 Latency | P95 Latency | Change |
+|-------|-----------|-------------|-------------|--------|
+| **Baseline** (single worker, pandas) | 11 req/s | 850 ms | 960 ms | - |
+| **Multi-worker** (4 workers) | 42 req/s | 220 ms | 280 ms | +3.8x |
+| **NumPy features** | 101 req/s | 89 ms | 147 ms | +9.2x total |
+
+**Final Performance (200 requests, concurrency=10):**
+- Throughput: **94.6 req/s**
+- P50 Latency: **88.3 ms**
+- P95 Latency: **213.1 ms**
+- Error Rate: **0%**
 
 ### Remaining Bottleneck
 
@@ -120,6 +132,26 @@ ONNX image inference is now the slowest part (42ms, 52% of total time).
 | 3 | Quantize ONNX to INT8 | 2-3x faster | **Next** |
 | 4 | GPU acceleration | 5-10x faster | If needed |
 | 5 | Binary image upload | 10-20ms saved | Nice-to-have |
+
+---
+
+## Load Testing Methodology
+
+**Tool**: Locust (Python load testing framework)
+
+**Test Script**: `tests/scripts/load_test.py`
+
+**Configuration**:
+- Request levels: 10, 50, 200
+- Concurrency: 10 users
+- Endpoint: POST /predict with sensor + image data
+- Host: localhost:8000 (Docker container)
+
+**Run Load Test**:
+```powershell
+cd tests/scripts
+locust -f load_test.py --headless -u 10 -r 2 -t 30s --host http://localhost:8000
+```
 
 ---
 
