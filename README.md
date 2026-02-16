@@ -156,6 +156,28 @@ $env:RUST_MODEL_TYPE="clip"
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
+### 📥 CLIP Model Download (Optional)
+
+The CLIP model files are **not included** in the repository due to size (335 MB). If you want to experiment with CLIP:
+
+1. **Download the CLIP model files** from [Google Drive](https://drive.google.com/drive/folders/YOUR_FOLDER_ID) or train your own using the notebook in `Rust_Detection_Notebook/`
+
+2. **Place the files in the artifacts folder:**
+   ```
+   artifacts/
+   ├── rust_clip.onnx           # CLIP model architecture
+   └── rust_clip.onnx.data      # CLIP model weights (335 MB)
+   ```
+
+3. **Set the environment variable and restart:**
+   ```powershell
+   $env:RUST_MODEL_TYPE="clip"
+   uvicorn app.main:app --host 0.0.0.0 --port 8000
+   ```
+
+> **Note**: CLIP is provided for research comparison only. MobileNetV3 outperforms CLIP on our test set (100% vs 70% accuracy) and is 10x smaller.
+
+---
 
 ##  Project Structure
 
